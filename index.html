@@ -95,7 +95,10 @@
     </div>
 
     <main>
-        <div id="loader" style="text-align:center; padding: 40px; font-weight: 600; color: var(--accent-color);">Cargando base de datos completa...</div>
+        <div id="loader" style="text-align:center; padding: 40px; font-weight: 600; color: var(--accent-color);">
+            Sincronizando todas las referencias...<br>
+            <span style="font-size:0.8rem; color:#999; font-weight:400">(Esto puede tomar unos segundos)</span>
+        </div>
 
         <div id="appContainer" style="display:none">
             
@@ -150,6 +153,7 @@
         const LOCATIONS = Object.keys(SHEETS).filter(k => k !== 'Referencias');
         let inventory = {};
         let pricesMap = {};
+        let allUniqueRefs = new Set(); // Colección global de referencias únicas
 
         async function init() {
             const promises = Object.entries(SHEETS).map(([name, url]) => {
@@ -172,27 +176,34 @@
 
         function process(name, rows) {
             rows.forEach(row => {
-                const ref = row['Referencia']?.trim();
-                const size = row['Talla']?.trim();
-                if(!ref || ref === "") return; // Ignorar filas realmente vacías
+                // Validación estricta para asegurar que leemos todo
+                const ref = row['Referencia'] ? row['Referencia'].trim() : null;
+                const size = row['Talla'] ? row['Talla'].trim() : null;
+                
+                // Si no hay nombre de referencia, saltamos esta fila
+                if(!ref || ref === "") return; 
 
-                if(name === 'Referencias') {
-                    if(!inventory[ref]) inventory[ref] = {};
-                    if(size && !inventory[ref][size]) {
-                        inventory[ref][size] = {};
-                        LOCATIONS.forEach(l => inventory[ref][size][l] = 0);
-                    }
-                    if(row['Precio Nuevo Paralelo y Multimarcas']) {
-                        pricesMap[ref] = row['Precio Nuevo Paralelo y Multimarcas'];
-                    }
-                } else if(size) {
-                    if(!inventory[ref]) inventory[ref] = {};
+                // Agregar a la lista global (sin importar de qué hoja venga)
+                allUniqueRefs.add(ref);
+
+                // Lógica de Precios (Solo hoja Referencias)
+                if(name === 'Referencias' && row['Precio Nuevo Paralelo y Multimarcas']) {
+                    pricesMap[ref] = row['Precio Nuevo Paralelo y Multimarcas'];
+                }
+
+                // Lógica de Inventario
+                if(!inventory[ref]) inventory[ref] = {};
+                
+                if(size) {
                     if(!inventory[ref][size]) {
                         inventory[ref][size] = {};
                         LOCATIONS.forEach(l => inventory[ref][size][l] = 0);
                     }
-                    let qty = parseInt(String(row['Saldo actual']).replace(/[^0-9]/g, '')) || 0;
-                    inventory[ref][size][name] = qty;
+                    // Si no es la hoja de referencias, asumimos que es una tienda
+                    if(name !== 'Referencias') {
+                        let qty = parseInt(String(row['Saldo actual']).replace(/[^0-9]/g, '')) || 0;
+                        inventory[ref][size][name] = qty;
+                    }
                 }
             });
         }
@@ -200,11 +211,13 @@
         function fillRefs() {
             const list = document.getElementById('refList');
             list.innerHTML = "";
-            // Usamos un Set para asegurar que no haya duplicados y ordenamos de A a Z
-            const sortedRefs = Object.keys(pricesMap).sort((a, b) => a.localeCompare(b));
+            // Convertimos el Set a Array y ordenamos alfabéticamente
+            const sortedRefs = Array.from(allUniqueRefs).sort((a, b) => a.localeCompare(b));
+            
             sortedRefs.forEach(r => {
                 const opt = document.createElement('option');
-                opt.value = r; list.appendChild(opt);
+                opt.value = r; 
+                list.appendChild(opt);
             });
         }
 
@@ -249,7 +262,7 @@
             const container = document.getElementById('inventoryResult');
 
             if(!inventory[ref]) {
-                container.innerHTML = "<p style='color:red; text-align:center;'>El producto no existe o está mal escrito.</p>";
+                container.innerHTML = "<p style='color:red; text-align:center; padding: 20px;'>Producto no encontrado o nombre incorrecto.</p>";
                 return;
             }
 
@@ -280,7 +293,17 @@
                     </div>
                 `;
             } else {
-                container.innerHTML = "<p style='color:red; text-align:center; padding:20px;'>Referencia no encontrada.</p>";
+                // Si no está en el mapa de precios pero sí en inventario, mostramos aviso
+                if(inventory[ref]) {
+                     container.innerHTML = `
+                        <div class="price-display" style="border-color:#d4a373">
+                            <div class="price-value" style="font-size:1.5rem; color:#666">Precio no registrado</div>
+                            <div style="color:#999; font-size:0.8rem;">El producto existe en inventario pero no tiene precio asignado en la hoja maestra.</div>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = "<p style='color:red; text-align:center; padding:20px;'>Referencia no encontrada.</p>";
+                }
             }
         }
 
