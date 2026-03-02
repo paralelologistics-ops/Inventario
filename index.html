@@ -25,86 +25,27 @@
             background-color: var(--bg-color);
             color: var(--text-color);
             margin: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
+            display: flex; flex-direction: column; align-items: center;
         }
 
-        header {
-            text-align: center;
-            padding: 30px 20px 10px 20px;
-            width: 100%;
-        }
+        header { text-align: center; padding: 30px 20px 10px 20px; width: 100%; }
+        .logo-container img { height: 60px; margin-bottom: 10px; filter: grayscale(100%); }
+        h1 { font-family: 'Montserrat'; font-weight: 700; font-size: 1.6rem; letter-spacing: 2px; text-transform: uppercase; margin: 0; }
 
-        .logo-container img {
-            height: 60px;
-            margin-bottom: 10px;
-            filter: grayscale(100%);
-        }
+        /* --- PESTAÑAS --- */
+        .tabs-container { display: flex; gap: 10px; margin: 20px 0; width: 90%; max-width: 1100px; }
+        .tab-button { flex: 1; padding: 15px; border: none; background: #eee; font-family: 'Montserrat'; font-weight: 600; text-transform: uppercase; font-size: 0.8rem; cursor: pointer; border-radius: 8px 8px 0 0; transition: 0.3s; color: #888; }
+        .tab-button.active { background: white; color: var(--dark-color); border-bottom: 3px solid var(--accent-color); }
 
-        h1 {
-            font-family: 'Montserrat', sans-serif;
-            font-weight: 700;
-            font-size: 1.6rem;
-            letter-spacing: 2px;
-            text-transform: uppercase;
-            margin: 0;
-            color: var(--dark-color);
-        }
-
-        /* --- SISTEMA DE PESTAÑAS --- */
-        .tabs-container {
-            display: flex;
-            gap: 10px;
-            margin: 20px 0;
-            width: 90%;
-            max-width: 1100px;
-        }
-
-        .tab-button {
-            flex: 1;
-            padding: 15px;
-            border: none;
-            background: #eee;
-            font-family: 'Montserrat';
-            font-weight: 600;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            cursor: pointer;
-            border-radius: 8px 8px 0 0;
-            transition: all 0.3s;
-            color: #888;
-        }
-
-        .tab-button.active {
-            background: white;
-            color: var(--dark-color);
-            box-shadow: 0 -5px 15px rgba(0,0,0,0.05);
-            border-bottom: 3px solid var(--accent-color);
-        }
-
-        /* --- CONTENIDO --- */
-        main {
-            width: 95%;
-            max-width: 1100px;
-            background: white;
-            padding: 30px;
-            border-radius: 0 0 var(--border-radius) var(--border-radius);
-            box-shadow: var(--shadow);
-            margin-bottom: 40px;
-            min-height: 300px;
-        }
-
+        main { width: 95%; max-width: 1100px; background: white; padding: 30px; border-radius: 0 0 var(--border-radius) var(--border-radius); box-shadow: var(--shadow); margin-bottom: 40px; min-height: 400px; }
         .content-section { display: none; }
-        .content-section.active { display: block; animation: fadeIn 0.4s ease; }
+        .content-section.active { display: block; }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-
-        /* --- FORMULARIOS --- */
+        /* --- BUSCADOR --- */
         .search-grid {
             display: grid;
-            grid-template-columns: 2fr 1fr auto;
-            gap: 15px;
+            grid-template-columns: 2fr 1fr auto auto;
+            gap: 12px;
             align-items: flex-end;
             margin-bottom: 30px;
             background: #fafafa;
@@ -116,48 +57,27 @@
 
         .input-group { display: flex; flex-direction: column; }
         label { font-family: 'Montserrat'; font-weight: 600; font-size: 0.7rem; text-transform: uppercase; margin-bottom: 5px; color: #888; }
-        input, select { padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-family: 'Poppins'; }
+        input, select { padding: 12px; border: 1px solid #ddd; border-radius: 6px; font-family: 'Poppins'; width: 100%; box-sizing: border-box; }
 
-        .btn-search {
-            background-color: var(--dark-color);
-            color: white;
-            padding: 14px 30px;
-            border: none;
-            border-radius: 6px;
-            font-family: 'Montserrat';
-            font-weight: 700;
-            text-transform: uppercase;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
+        .btn-search { background-color: var(--dark-color); color: white; padding: 14px 25px; border: none; border-radius: 6px; font-family: 'Montserrat'; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: 0.3s; }
         .btn-search:hover { background-color: var(--accent-color); }
 
-        /* --- PRECIO CARD --- */
-        .price-display {
-            text-align: center;
-            padding: 40px;
-            border: 2px dashed #eee;
-            border-radius: 12px;
-            margin-top: 20px;
-        }
+        .btn-clear { background-color: #e0e0e0; color: #666; padding: 14px 20px; border: none; border-radius: 6px; font-family: 'Montserrat'; font-weight: 700; text-transform: uppercase; cursor: pointer; transition: 0.3s; }
+        .btn-clear:hover { background-color: #d0d0d0; color: #333; }
 
-        .price-value {
-            font-size: 3.5rem;
-            font-family: 'Montserrat';
-            font-weight: 700;
-            color: var(--dark-color);
-            margin: 10px 0;
-        }
-
+        /* --- RESULTADOS --- */
+        .price-display { text-align: center; padding: 40px; border: 2px dashed #eee; border-radius: 12px; margin-top: 20px; animation: slideUp 0.3s ease; }
+        .price-value { font-size: 3.5rem; font-family: 'Montserrat'; font-weight: 700; color: var(--dark-color); margin: 10px 0; }
         .price-label { font-family: 'Montserrat'; color: var(--accent-color); letter-spacing: 2px; text-transform: uppercase; }
 
-        /* --- TABLAS --- */
-        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th { background: #f8f8f8; color: #999; font-size: 0.7rem; padding: 12px; text-transform: uppercase; text-align: center; border-bottom: 2px solid #eee; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; animation: fadeIn 0.5s ease; }
+        th { background: #f8f8f8; color: #999; font-size: 0.7rem; padding: 12px; text-transform: uppercase; border-bottom: 2px solid #eee; }
         td { padding: 15px; text-align: center; border-bottom: 1px solid #f9f9f9; font-size: 0.9rem; }
-        .has-stock { font-weight: 600; }
+        .has-stock { font-weight: 600; color: var(--dark-color); }
         .no-stock { color: #ddd; }
+
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideUp { from { transform: translateY(10px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
 
         .instructions { font-size: 0.8rem; color: #777; margin-bottom: 20px; border-left: 3px solid var(--accent-color); padding-left: 15px; }
     </style>
@@ -170,43 +90,41 @@
     </header>
 
     <div class="tabs-container">
-        <button class="tab-button active" onclick="openTab('inventory')">📦 Inventarios</button>
-        <button class="tab-button" onclick="openTab('prices')">💰 Precios</button>
+        <button class="tab-button active" id="btn-tab-inv" onclick="openTab('inventory')">📦 Inventarios</button>
+        <button class="tab-button" id="btn-tab-pri" onclick="openTab('prices')">💰 Precios</button>
     </div>
 
     <main>
-        <div id="loader" style="text-align:center; padding: 40px;">Sincronizando datos...</div>
+        <div id="loader" style="text-align:center; padding: 40px; font-weight: 600; color: var(--accent-color);">Cargando base de datos completa...</div>
 
         <div id="appContainer" style="display:none">
             
             <section id="inventory" class="content-section active">
-                <div class="instructions">
-                    <b>Consulta de Stock:</b> Selecciona referencia y talla para ver disponibilidad en sedes.
-                </div>
+                <div class="instructions"><b>Stock por Sede:</b> Selecciona producto y talla para ver existencias.</div>
                 <div class="search-grid">
                     <div class="input-group">
                         <label>Referencia</label>
-                        <input type="text" class="refInput" list="refList" placeholder="Ej: AKIRA PANT">
+                        <input type="text" id="invRefInput" list="refList" placeholder="Escribe para buscar..." oninput="syncInputs(this.value)">
                     </div>
                     <div class="input-group">
                         <label>Talla</label>
-                        <select class="sizeSelect"><option value="">Selecciona...</option></select>
+                        <select id="invSizeSelect"><option value="">Selecciona producto...</option></select>
                     </div>
-                    <button class="btn-search" onclick="searchStock()">Consultar Stock</button>
+                    <button class="btn-search" onclick="searchStock()">Buscar</button>
+                    <button class="btn-clear" onclick="clearAll()">Limpiar</button>
                 </div>
                 <div id="inventoryResult"></div>
             </section>
 
             <section id="prices" class="content-section">
-                <div class="instructions">
-                    <b>Consulta de Precios:</b> Obtén el precio oficial de venta para la referencia seleccionada.
-                </div>
-                <div class="search-grid">
-                    <div class="input-group" style="grid-column: span 2;">
+                <div class="instructions"><b>Precios de Venta:</b> Consulta el precio oficial PVP.</div>
+                <div class="search-grid" style="grid-template-columns: 3fr auto auto;">
+                    <div class="input-group">
                         <label>Referencia del Producto</label>
-                        <input type="text" class="refInput" list="refList" placeholder="Escribe o escoge el nombre del producto...">
+                        <input type="text" id="priRefInput" list="refList" placeholder="Escribe para buscar..." oninput="syncInputs(this.value)">
                     </div>
                     <button class="btn-search" onclick="searchPrice()">Ver Precio</button>
+                    <button class="btn-clear" onclick="clearAll()">Limpiar</button>
                 </div>
                 <div id="priceResult"></div>
             </section>
@@ -237,7 +155,7 @@
             const promises = Object.entries(SHEETS).map(([name, url]) => {
                 return new Promise(resolve => {
                     Papa.parse(url, {
-                        download: true, header: true,
+                        download: true, header: true, skipEmptyLines: true,
                         complete: res => resolve({name, data: res.data}),
                         error: () => resolve({name, data: []})
                     });
@@ -256,7 +174,7 @@
             rows.forEach(row => {
                 const ref = row['Referencia']?.trim();
                 const size = row['Talla']?.trim();
-                if(!ref) return;
+                if(!ref || ref === "") return; // Ignorar filas realmente vacías
 
                 if(name === 'Referencias') {
                     if(!inventory[ref]) inventory[ref] = {};
@@ -264,7 +182,6 @@
                         inventory[ref][size] = {};
                         LOCATIONS.forEach(l => inventory[ref][size][l] = 0);
                     }
-                    // Guardar precio
                     if(row['Precio Nuevo Paralelo y Multimarcas']) {
                         pricesMap[ref] = row['Precio Nuevo Paralelo y Multimarcas'];
                     }
@@ -282,52 +199,62 @@
 
         function fillRefs() {
             const list = document.getElementById('refList');
-            Object.keys(pricesMap).sort().forEach(r => {
+            list.innerHTML = "";
+            // Usamos un Set para asegurar que no haya duplicados y ordenamos de A a Z
+            const sortedRefs = Object.keys(pricesMap).sort((a, b) => a.localeCompare(b));
+            sortedRefs.forEach(r => {
                 const opt = document.createElement('option');
                 opt.value = r; list.appendChild(opt);
             });
         }
 
-        // Sincronizar inputs de referencia entre pestañas
-        document.querySelectorAll('.refInput').forEach(input => {
-            input.addEventListener('input', e => {
-                const val = e.target.value;
-                document.querySelectorAll('.refInput').forEach(i => i.value = val);
-                updateSizes(val);
-            });
-        });
+        function syncInputs(val) {
+            document.getElementById('invRefInput').value = val;
+            document.getElementById('priRefInput').value = val;
+            updateSizes(val);
+        }
 
         function updateSizes(ref) {
-            const sel = document.querySelector('.sizeSelect');
+            const sel = document.getElementById('invSizeSelect');
             if(inventory[ref]) {
+                const sizes = Object.keys(inventory[ref]).sort();
                 sel.innerHTML = '<option value="ALL">Todas las tallas</option>';
-                Object.keys(inventory[ref]).sort().forEach(s => {
+                sizes.forEach(s => {
                     sel.innerHTML += `<option value="${s}">${s}</option>`;
                 });
             } else {
-                sel.innerHTML = '<option value="">Selecciona...</option>';
+                sel.innerHTML = '<option value="">Selecciona producto...</option>';
             }
         }
 
         function openTab(tabId) {
             document.querySelectorAll('.tab-button').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.content-section').forEach(s => s.classList.remove('active'));
-            event.currentTarget.classList.add('active');
+            if(tabId === 'inventory') document.getElementById('btn-tab-inv').classList.add('active');
+            else document.getElementById('btn-tab-pri').classList.add('active');
             document.getElementById(tabId).classList.add('active');
         }
 
+        function clearAll() {
+            document.getElementById('invRefInput').value = "";
+            document.getElementById('priRefInput').value = "";
+            document.getElementById('invSizeSelect').innerHTML = '<option value="">Selecciona producto...</option>';
+            document.getElementById('inventoryResult').innerHTML = "";
+            document.getElementById('priceResult').innerHTML = "";
+        }
+
         function searchStock() {
-            const ref = document.querySelector('#inventory .refInput').value;
-            const size = document.querySelector('.sizeSelect').value;
+            const ref = document.getElementById('invRefInput').value;
+            const size = document.getElementById('invSizeSelect').value;
             const container = document.getElementById('inventoryResult');
 
             if(!inventory[ref]) {
-                container.innerHTML = "<p style='color:red; text-align:center;'>Referencia no encontrada.</p>";
+                container.innerHTML = "<p style='color:red; text-align:center;'>El producto no existe o está mal escrito.</p>";
                 return;
             }
 
             let html = `<table><thead><tr><th>Talla</th>${LOCATIONS.map(l=>`<th>${l}</th>`).join('')}</tr></thead><tbody>`;
-            const sizes = size === 'ALL' ? Object.keys(inventory[ref]).sort() : [size];
+            const sizes = size === 'ALL' || size === "" ? Object.keys(inventory[ref]).sort() : [size];
             
             sizes.forEach(s => {
                 html += `<tr><td style="font-weight:700">${s}</td>`;
@@ -341,7 +268,7 @@
         }
 
         function searchPrice() {
-            const ref = document.querySelector('#prices .refInput').value;
+            const ref = document.getElementById('priRefInput').value;
             const container = document.getElementById('priceResult');
 
             if(pricesMap[ref]) {
@@ -349,11 +276,11 @@
                     <div class="price-display">
                         <div class="price-label">Precio de Venta Público</div>
                         <div class="price-value">${pricesMap[ref]}</div>
-                        <div style="color:#999; font-size:0.8rem;">Referencia: ${ref}</div>
+                        <div style="color:#999; font-size:0.8rem;">Ref: ${ref}</div>
                     </div>
                 `;
             } else {
-                container.innerHTML = "<p style='color:red; text-align:center; padding:20px;'>Referencia no encontrada o no tiene precio asignado.</p>";
+                container.innerHTML = "<p style='color:red; text-align:center; padding:20px;'>Referencia no encontrada.</p>";
             }
         }
 
@@ -361,4 +288,3 @@
     </script>
 </body>
 </html>
-
