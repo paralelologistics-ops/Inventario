@@ -3,326 +3,260 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Sistema PARALELO - Stock & Precios</title>
+    <title>Inventarios PARALELO - Full Database</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
     <style>
-        :root {
-            --accent: #d4a373;
-            --dark: #1a1a1a;
-            --gray: #f8f9fa;
-            --border: #e9ecef;
-        }
-
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f4f4f4;
-            margin: 0;
-            color: #333;
-        }
-
+        :root { --accent: #d4a373; --dark: #1a1a1a; --border: #e9ecef; }
+        body { font-family: 'Poppins', sans-serif; background-color: #f4f4f4; margin: 0; color: #333; }
         header { background: white; padding: 20px; text-align: center; border-bottom: 1px solid var(--border); }
         .logo { height: 50px; margin-bottom: 10px; }
-        h1 { font-family: 'Montserrat'; font-size: 1.2rem; letter-spacing: 2px; margin: 0; text-transform: uppercase; }
-
         .container { width: 95%; max-width: 1000px; margin: 20px auto; }
         
         /* Instrucciones */
-        .instructions {
-            background: #fffcf5;
-            border-left: 4px solid var(--accent);
-            padding: 15px;
-            margin-bottom: 20px;
-            border-radius: 4px;
-            font-size: 0.9rem;
-        }
-        .instructions h4 { margin: 0 0 5px 0; color: var(--accent); text-transform: uppercase; font-size: 0.8rem; }
-
+        .instructions { background: #fff; padding: 15px; margin-bottom: 20px; border-radius: 8px; border-left: 5px solid var(--accent); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        
         /* Tabs */
         .tabs { display: flex; background: #ddd; border-radius: 8px 8px 0 0; overflow: hidden; }
-        .tab { flex: 1; padding: 15px; border: none; cursor: pointer; font-family: 'Montserrat'; font-weight: 600; color: #666; transition: 0.3s; }
+        .tab { flex: 1; padding: 15px; border: none; cursor: pointer; font-family: 'Montserrat'; font-weight: 600; color: #666; }
         .tab.active { background: white; color: var(--dark); border-top: 3px solid var(--accent); }
 
         .content { background: white; padding: 25px; border-radius: 0 0 8px 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); min-height: 400px; }
         .panel { display: none; }
-        .panel.active { display: block; animation: fadeIn 0.3s; }
+        .panel.active { display: block; }
 
-        /* Buscador */
-        .search-box { position: relative; width: 100%; }
+        /* BUSCADOR FILTRADO */
+        .search-container { position: relative; width: 100%; }
         .input-main { 
             width: 100%; padding: 15px; border: 2px solid var(--border); border-radius: 8px; 
-            font-size: 1rem; box-sizing: border-box; outline: none; background: #fff;
+            font-size: 1rem; box-sizing: border-box; outline: none;
         }
         .input-main:focus { border-color: var(--accent); }
 
-        .results-list { 
+        .custom-list { 
             position: absolute; width: 100%; background: white; border: 1px solid #ccc; 
-            max-height: 250px; overflow-y: auto; z-index: 1000; border-radius: 0 0 8px 8px;
-            display: none; box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+            max-height: 280px; overflow-y: auto; z-index: 9999; border-radius: 0 0 8px 8px;
+            display: none; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
         }
-        .results-list div { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #eee; font-size: 0.9rem; }
-        .results-list div:hover { background: #fffcf5; color: var(--accent); font-weight: 600; }
+        .custom-list div { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #f0f0f0; font-size: 0.9rem; }
+        .custom-list div:hover { background: #fdf8f3; color: var(--accent); font-weight: 600; }
 
         /* Grid */
-        .grid-inputs { display: grid; grid-template-columns: 2fr 1fr auto; gap: 10px; margin-bottom: 20px; align-items: flex-start; }
+        .grid-inputs { display: grid; grid-template-columns: 2fr 1fr auto auto; gap: 10px; margin-bottom: 20px; }
         @media (max-width: 700px) { .grid-inputs { grid-template-columns: 1fr; } }
 
-        select { padding: 14px; border: 2px solid var(--border); border-radius: 8px; background: white; width: 100%; font-family: 'Poppins'; }
-
-        .btn-action { 
-            background: var(--dark); color: white; padding: 14px 25px; border: none; 
-            border-radius: 8px; cursor: pointer; font-weight: 600; text-transform: uppercase; height: 52px;
-        }
-        .btn-action:hover { background: var(--accent); }
-        .btn-clear { background: #e0e0e0; color: #444; }
+        select { padding: 14px; border: 2px solid var(--border); border-radius: 8px; background: white; width: 100%; }
+        .btn { background: var(--dark); color: white; padding: 14px 20px; border: none; border-radius: 8px; cursor: pointer; font-weight: 600; text-transform: uppercase; }
+        .btn:hover { background: var(--accent); }
+        .btn-clear { background: #eee; color: #666; }
 
         /* Tabla */
-        .table-wrap { overflow-x: auto; margin-top: 20px; }
-        table { width: 100%; border-collapse: collapse; background: white; }
-        th { background: var(--gray); padding: 12px; font-size: 0.75rem; text-transform: uppercase; color: #888; border-bottom: 2px solid #eee; }
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th { background: #f8f9fa; padding: 12px; font-size: 0.7rem; text-transform: uppercase; color: #999; border-bottom: 2px solid #eee; }
         td { padding: 12px; text-align: center; border-bottom: 1px solid #f9f9f9; }
-        .stock-num { font-weight: 700; color: var(--dark); background: #fdf8f3; }
-        .no-stock { color: #ddd; }
-
-        #status { text-align: center; padding: 40px; color: var(--accent); font-weight: 600; }
-        
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .stock-val { font-weight: 700; color: #1a1a1a; }
+        .empty { color: #ddd; }
     </style>
 </head>
 <body>
 
-    <header>
-        <img class="logo" src="https://static.wixstatic.com/media/d0ce54_32d30a8159fd44d4a26c62563d7bfc38~mv2.jpg">
-        <h1>Inventarios PARALELO</h1>
-    </header>
+<header>
+    <img class="logo" src="https://static.wixstatic.com/media/d0ce54_32d30a8159fd44d4a26c62563d7bfc38~mv2.jpg">
+    <h1>CONSULTA DE INVENTARIOS</h1>
+</header>
 
-    <div class="container">
-        
-        <div class="instructions">
-            <h4>¿Cómo consultar?</h4>
-            1. Haz clic en <b>Buscar producto</b> para ver la lista o escribe el nombre.<br>
-            2. <b>Selecciona</b> el producto de la lista desplegable.<br>
-            3. Elige una <b>Talla</b> (opcional) y presiona el botón <b>VER</b>.
+<div class="container">
+    <div class="instructions">
+        <strong>Instrucciones:</strong> Escribe el nombre del producto (ej: <em>Zofya</em> o <em>Short</em>) y <b>selecciónalo de la lista</b> que aparecerá abajo para poder ver el inventario o el precio.
+    </div>
+
+    <div id="loader" style="text-align:center; padding:20px; color:var(--accent);">Cargando base de datos completa (A-Z)...</div>
+
+    <div id="app" style="display:none">
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('inv', this)">📦 STOCK</button>
+            <button class="tab" onclick="switchTab('pri', this)">💰 PRECIOS</button>
         </div>
 
-        <div id="status">Cargando base de datos ilimitada...</div>
-
-        <div id="app" style="display:none">
-            <div class="tabs">
-                <button id="tab-inv" class="tab active" onclick="showPanel('inv', this)">📦 CONSULTAR STOCK</button>
-                <button id="tab-pri" class="tab" onclick="showPanel('pri', this)">💰 CONSULTAR PRECIO</button>
+        <div class="content">
+            <div id="panel-inv" class="panel active">
+                <div class="grid-inputs">
+                    <div class="search-container">
+                        <input type="text" id="inputInv" class="input-main" placeholder="Escribe para buscar producto..." oninput="handleSearch(this.value, 'listInv')" autocomplete="off">
+                        <div id="listInv" class="custom-list"></div>
+                    </div>
+                    <select id="sizeInv"><option value="">Talla...</option></select>
+                    <button class="btn" onclick="showStock()">VER</button>
+                    <button class="btn btn-clear" onclick="clearData()">Limpiar</button>
+                </div>
+                <div id="resInv"></div>
             </div>
 
-            <div class="content">
-                <div id="panel-inv" class="panel active">
-                    <div class="grid-inputs">
-                        <div class="search-box">
-                            <input type="text" id="refSearch" class="input-main" 
-                                   placeholder="Click para ver productos..." 
-                                   onfocus="filterRefs('', 'resList')" 
-                                   oninput="filterRefs(this.value, 'resList')" 
-                                   autocomplete="off">
-                            <div id="resList" class="results-list"></div>
-                        </div>
-                        <select id="sizeSelect"><option value="">Talla...</option></select>
-                        <div style="display:flex; gap:5px;">
-                            <button class="btn-action" onclick="renderStock()">Ver</button>
-                            <button class="btn-action btn-clear" onclick="reset()">Limpiar</button>
-                        </div>
+            <div id="panel-pri" class="panel">
+                <div class="grid-inputs" style="grid-template-columns: 3fr auto auto;">
+                    <div class="search-container">
+                        <input type="text" id="inputPri" class="input-main" placeholder="Buscar producto para precio..." oninput="handleSearch(this.value, 'listPri')" autocomplete="off">
+                        <div id="listPri" class="custom-list"></div>
                     </div>
-                    <div id="outStock" class="table-wrap"></div>
+                    <button class="btn" onclick="showPrice()">VER PRECIO</button>
+                    <button class="btn btn-clear" onclick="clearData()">Limpiar</button>
                 </div>
-
-                <div id="panel-pri" class="panel">
-                    <div class="grid-inputs" style="grid-template-columns: 2fr auto auto;">
-                        <div class="search-box">
-                            <input type="text" id="priSearch" class="input-main" 
-                                   placeholder="Escribe el producto..." 
-                                   onfocus="filterRefs('', 'resListPri')" 
-                                   oninput="filterRefs(this.value, 'resListPri')" 
-                                   autocomplete="off">
-                            <div id="resListPri" class="results-list"></div>
-                        </div>
-                        <button class="btn-action" onclick="renderPrice()">Ver Precio</button>
-                        <button class="btn-action btn-clear" onclick="reset()">Limpiar</button>
-                    </div>
-                    <div id="outPrice" style="text-align:center; padding:30px;"></div>
-                </div>
+                <div id="resPri" style="text-align:center; padding-top:20px;"></div>
             </div>
         </div>
     </div>
+</div>
 
-    <script>
-        const URLS = {
-            'Referencias': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSo_xmNEQffBWChyZawoj5YNVOhijLLGA-bpBGQHGiTyDeSKV_T-tdW1GQeBjsulx146kbq2V2SPXmN/pub?gid=491957809&single=true&output=csv',
-            'Amorella': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSo_xmNEQffBWChyZawoj5YNVOhijLLGA-bpBGQHGiTyDeSKV_T-tdW1GQeBjsulx146kbq2V2SPXmN/pub?gid=1065082332&single=true&output=csv',
-            'Emprenditoria': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSo_xmNEQffBWChyZawoj5YNVOhijLLGA-bpBGQHGiTyDeSKV_T-tdW1GQeBjsulx146kbq2V2SPXmN/pub?gid=1743770835&single=true&output=csv',
-            'ID Design': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSo_xmNEQffBWChyZawoj5YNVOhijLLGA-bpBGQHGiTyDeSKV_T-tdW1GQeBjsulx146kbq2V2SPXmN/pub?gid=1231428952&single=true&output=csv',
-            'Ginebra': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSo_xmNEQffBWChyZawoj5YNVOhijLLGA-bpBGQHGiTyDeSKV_T-tdW1GQeBjsulx146kbq2V2SPXmN/pub?gid=557549372&single=true&output=csv',
-            'Benditta': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSo_xmNEQffBWChyZawoj5YNVOhijLLGA-bpBGQHGiTyDeSKV_T-tdW1GQeBjsulx146kbq2V2SPXmN/pub?gid=0&single=true&output=csv',
-            'Taller': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSo_xmNEQffBWChyZawoj5YNVOhijLLGA-bpBGQHGiTyDeSKV_T-tdW1GQeBjsulx146kbq2V2SPXmN/pub?gid=753428539&single=true&output=csv',
-            'Natalia': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSo_xmNEQffBWChyZawoj5YNVOhijLLGA-bpBGQHGiTyDeSKV_T-tdW1GQeBjsulx146kbq2V2SPXmN/pub?gid=1564348751&single=true&output=csv',
-            'Manuela': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSo_xmNEQffBWChyZawoj5YNVOhijLLGA-bpBGQHGiTyDeSKV_T-tdW1GQeBjsulx146kbq2V2SPXmN/pub?gid=1147281710&single=true&output=csv'
-        };
+<script>
+    const SHEETS = {
+        'Referencias': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSo_xmNEQffBWChyZawoj5YNVOhijLLGA-bpBGQHGiTyDeSKV_T-tdW1GQeBjsulx146kbq2V2SPXmN/pub?gid=491957809&single=true&output=csv',
+        'Amorella': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSo_xmNEQffBWChyZawoj5YNVOhijLLGA-bpBGQHGiTyDeSKV_T-tdW1GQeBjsulx146kbq2V2SPXmN/pub?gid=1065082332&single=true&output=csv',
+        'Emprenditoria': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSo_xmNEQffBWChyZawoj5YNVOhijLLGA-bpBGQHGiTyDeSKV_T-tdW1GQeBjsulx146kbq2V2SPXmN/pub?gid=1743770835&single=true&output=csv',
+        'ID Design': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSo_xmNEQffBWChyZawoj5YNVOhijLLGA-bpBGQHGiTyDeSKV_T-tdW1GQeBjsulx146kbq2V2SPXmN/pub?gid=1231428952&single=true&output=csv',
+        'Ginebra': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSo_xmNEQffBWChyZawoj5YNVOhijLLGA-bpBGQHGiTyDeSKV_T-tdW1GQeBjsulx146kbq2V2SPXmN/pub?gid=557549372&single=true&output=csv',
+        'Benditta': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSo_xmNEQffBWChyZawoj5YNVOhijLLGA-bpBGQHGiTyDeSKV_T-tdW1GQeBjsulx146kbq2V2SPXmN/pub?gid=0&single=true&output=csv',
+        'Taller': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSo_xmNEQffBWChyZawoj5YNVOhijLLGA-bpBGQHGiTyDeSKV_T-tdW1GQeBjsulx146kbq2V2SPXmN/pub?gid=753428539&single=true&output=csv',
+        'Natalia': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSo_xmNEQffBWChyZawoj5YNVOhijLLGA-bpBGQHGiTyDeSKV_T-tdW1GQeBjsulx146kbq2V2SPXmN/pub?gid=1564348751&single=true&output=csv',
+        'Manuela': 'https://docs.google.com/spreadsheets/d/e/2PACX-1vSo_xmNEQffBWChyZawoj5YNVOhijLLGA-bpBGQHGiTyDeSKV_T-tdW1GQeBjsulx146kbq2V2SPXmN/pub?gid=1147281710&single=true&output=csv'
+    };
 
-        const TIENDAS = Object.keys(URLS).filter(k => k !== 'Referencias');
-        let db_inventario = {};
-        let db_precios = {};
-        let lista_referencias = [];
+    const LOCS = Object.keys(SHEETS).filter(k => k !== 'Referencias');
+    let inventory = {}; 
+    let prices = {}; 
+    let refList = [];
 
-        async function cargarTodo() {
-            try {
-                const promesas = Object.entries(URLS).map(([sede, url]) => {
-                    return new Promise(resolve => {
-                        Papa.parse(url, {
-                            download: true, header: true, skipEmptyLines: 'greedy',
-                            complete: results => resolve({sede, data: results.data})
-                        });
-                    });
+    async function init() {
+        const promises = Object.entries(SHEETS).map(([name, url]) => {
+            return new Promise(resolve => {
+                Papa.parse(url, {
+                    download: true, header: true, skipEmptyLines: true,
+                    complete: res => resolve({name, data: res.data})
                 });
-
-                const resultados = await Promise.all(promesas);
-                let refsUnicas = new Set();
-
-                resultados.forEach(res => {
-                    res.data.forEach(fila => {
-                        let ref = fila['Referencia'] ? fila['Referencia'].trim() : "";
-                        if (ref.length < 2 || ref.startsWith('#')) return;
-
-                        refsUnicas.add(ref);
-                        if (res.sede === 'Referencias' && fila['Precio Nuevo Paralelo y Multimarcas']) {
-                            db_precios[ref] = fila['Precio Nuevo Paralelo y Multimarcas'];
-                        }
-
-                        let talla = fila['Talla'] ? fila['Talla'].trim() : "Única";
-                        if (!db_inventario[ref]) db_inventario[ref] = {};
-                        if (!db_inventario[ref][talla]) {
-                            db_inventario[ref][talla] = {};
-                            TIENDAS.forEach(t => db_inventario[ref][talla][t] = 0);
-                        }
-                        
-                        if (res.sede !== 'Referencias') {
-                            let stock = parseInt(String(fila['Saldo actual']).replace(/[^0-9-]/g, '')) || 0;
-                            db_inventario[ref][talla][res.sede] = stock;
-                        }
-                    });
-                });
-
-                lista_referencias = Array.from(refsUnicas).sort();
-                document.getElementById('status').style.display = 'none';
-                document.getElementById('app').style.display = 'block';
-
-            } catch (e) {
-                document.getElementById('status').innerText = "Error de conexión. Recarga la página.";
-            }
-        }
-
-        function filterRefs(query, targetListId) {
-            const val = query.toUpperCase();
-            const list = document.getElementById(targetListId);
-            list.innerHTML = "";
-            list.style.display = "block";
-
-            // Si no hay texto, mostrar las primeras 100 por defecto
-            const filtradas = val === "" 
-                ? lista_referencias.slice(0, 100) 
-                : lista_referencias.filter(r => r.toUpperCase().includes(val)).slice(0, 100);
-
-            filtradas.forEach(ref => {
-                const div = document.createElement('div');
-                div.innerText = ref;
-                div.onmousedown = (e) => { // Usamos mousedown para que ocurra antes del blur
-                    e.preventDefault();
-                    selectRef(ref);
-                };
-                list.appendChild(div);
             });
-        }
-
-        function selectRef(ref) {
-            // Actualizar ambos inputs
-            document.getElementById('refSearch').value = ref;
-            document.getElementById('priSearch').value = ref;
-            
-            // Ocultar listas
-            document.querySelectorAll('.results-list').forEach(l => l.style.display = 'none');
-            
-            // Cargar tallas
-            const sel = document.getElementById('sizeSelect');
-            sel.innerHTML = '<option value="ALL">Todas las tallas</option>';
-            if (db_inventario[ref]) {
-                Object.keys(db_inventario[ref]).sort().forEach(t => {
-                    sel.innerHTML += `<option value="${t}">${t}</option>`;
-                });
-            }
-        }
-
-        function renderStock() {
-            const ref = document.getElementById('refSearch').value;
-            const tallaSel = document.getElementById('sizeSelect').value;
-            const out = document.getElementById('outStock');
-
-            if (!ref || !db_inventario[ref]) {
-                out.innerHTML = "<p style='color:red; text-align:center;'>⚠️ Selecciona un producto válido de la lista.</p>";
-                return;
-            }
-
-            let html = `<table><thead><tr><th>Talla</th>${TIENDAS.map(t => `<th>${t}</th>`).join('')}</tr></thead><tbody>`;
-            const tallasAMostrar = (tallaSel === "ALL" || tallaSel === "") ? Object.keys(db_inventario[ref]).sort() : [tallaSel];
-
-            tallasAMostrar.forEach(t => {
-                html += `<tr><td style="font-weight:600">${t}</td>`;
-                TIENDAS.forEach(tienda => {
-                    let cant = db_inventario[ref][t][tienda];
-                    html += `<td class="${cant > 0 ? 'stock-num' : 'no-stock'}">${cant > 0 ? cant : '-'}</td>`;
-                });
-                html += `</tr>`;
-            });
-            out.innerHTML = html + "</tbody></table>";
-        }
-
-        function renderPrice() {
-            const ref = document.getElementById('priSearch').value;
-            const out = document.getElementById('outPrice');
-            const p = db_precios[ref];
-            
-            if (p) {
-                out.innerHTML = `<div style="padding:30px; border:2px solid var(--accent); border-radius:12px; background:#fffcf5;">
-                    <div style="color:var(--accent); font-size:0.8rem; font-weight:700; letter-spacing:1px; margin-bottom:10px;">PRECIO DE VENTA</div>
-                    <div style="font-size:3rem; font-weight:700; color:var(--dark)">${p}</div>
-                    <div style="color:#888; margin-top:10px;">REF: ${ref}</div>
-                </div>`;
-            } else {
-                out.innerHTML = `<p style="color:#999;">El producto existe, pero no tiene precio asignado en la base de datos.</p>`;
-            }
-        }
-
-        function showPanel(type, btn) {
-            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
-            btn.classList.add('active');
-            document.getElementById('panel-' + type).classList.add('active');
-        }
-
-        function reset() {
-            document.getElementById('refSearch').value = "";
-            document.getElementById('priSearch').value = "";
-            document.getElementById('outStock').innerHTML = "";
-            document.getElementById('outPrice').innerHTML = "";
-            document.getElementById('sizeSelect').innerHTML = '<option value="">Talla...</option>';
-        }
-
-        // Cerrar listas al hacer clic fuera
-        document.addEventListener('click', (e) => {
-            if (!e.target.classList.contains('input-main')) {
-                document.querySelectorAll('.results-list').forEach(l => l.style.display = 'none');
-            }
         });
 
-        cargarTodo();
-    </script>
+        const results = await Promise.all(promises);
+        let refsUnicas = new Set();
+
+        results.forEach(res => {
+            res.data.forEach(row => {
+                let ref = row['Referencia'] ? row['Referencia'].trim() : "";
+                if (ref.length < 2 || ref.startsWith('#')) return;
+
+                refsUnicas.add(ref);
+                if (res.name === 'Referencias') prices[ref] = row['Precio Nuevo Paralelo y Multimarcas'];
+
+                let talla = row['Talla'] ? row['Talla'].trim() : "UNICA";
+                if (!inventory[ref]) inventory[ref] = {};
+                if (!inventory[ref][talla]) {
+                    inventory[ref][talla] = {};
+                    LOCS.forEach(l => inventory[ref][talla][l] = 0);
+                }
+                if (res.name !== 'Referencias') {
+                    let qty = parseInt(String(row['Saldo actual']).replace(/[^0-9-]/g, '')) || 0;
+                    inventory[ref][talla][res.name] = qty;
+                }
+            });
+        });
+
+        refList = Array.from(refsUnicas).sort();
+        document.getElementById('loader').style.display = 'none';
+        document.getElementById('app').style.display = 'block';
+    }
+
+    function handleSearch(val, listId) {
+        const list = document.getElementById(listId);
+        list.innerHTML = "";
+        if (val.length < 1) { list.style.display = "none"; return; }
+
+        const filtered = refList.filter(r => r.toUpperCase().includes(val.toUpperCase())).slice(0, 50);
+        if (filtered.length > 0) {
+            list.style.display = "block";
+            filtered.forEach(r => {
+                const item = document.createElement('div');
+                item.innerText = r;
+                item.onmousedown = () => selectRef(r);
+                list.appendChild(item);
+            });
+        } else {
+            list.style.display = "none";
+        }
+    }
+
+    function selectRef(ref) {
+        document.getElementById('inputInv').value = ref;
+        document.getElementById('inputPri').value = ref;
+        document.querySelectorAll('.custom-list').forEach(l => l.style.display = 'none');
+        
+        const sel = document.getElementById('sizeInv');
+        sel.innerHTML = '<option value="ALL">Todas las tallas</option>';
+        if (inventory[ref]) {
+            Object.keys(inventory[ref]).sort().forEach(t => {
+                sel.innerHTML += `<option value="${t}">${t}</option>`;
+            });
+        }
+    }
+
+    function showStock() {
+        const ref = document.getElementById('inputInv').value;
+        const talla = document.getElementById('sizeInv').value;
+        const out = document.getElementById('resInv');
+
+        if (!inventory[ref]) { out.innerHTML = "<p style='color:red'>⚠️ Selecciona un producto de la lista.</p>"; return; }
+
+        let html = `<table><thead><tr><th>Talla</th>${LOCS.map(l => `<th>${l}</th>`).join('')}</tr></thead><tbody>`;
+        const tallas = (talla === "ALL" || talla === "") ? Object.keys(inventory[ref]).sort() : [talla];
+
+        tallas.forEach(t => {
+            html += `<tr><td style="font-weight:600">${t}</td>`;
+            LOCS.forEach(l => {
+                let q = inventory[ref][t][l];
+                html += `<td class="${q > 0 ? 'stock-val' : 'empty'}">${q > 0 ? q : '-'}</td>`;
+            });
+            html += `</tr>`;
+        });
+        out.innerHTML = html + "</tbody></table>";
+    }
+
+    function showPrice() {
+        const ref = document.getElementById('inputPri').value;
+        const out = document.getElementById('resPri');
+        if (prices[ref]) {
+            out.innerHTML = `<div style="border:2px solid var(--accent); padding:20px; border-radius:15px; background:#fffcf5;">
+                <small style="color:#999">PRECIO DE VENTA</small>
+                <div style="font-size:2.5rem; font-weight:700;">${prices[ref]}</div>
+                <div style="color:#666">${ref}</div>
+            </div>`;
+        } else {
+            out.innerHTML = "<p>Referencia no encontrada o sin precio.</p>";
+        }
+    }
+
+    function switchTab(p, btn) {
+        document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('panel-' + p).classList.add('active');
+    }
+
+    function clearData() {
+        document.querySelectorAll('input').forEach(i => i.value = "");
+        document.getElementById('resInv').innerHTML = "";
+        document.getElementById('resPri').innerHTML = "";
+        document.getElementById('sizeInv').innerHTML = '<option value="">Talla...</option>';
+    }
+
+    // Cerrar listas al hacer clic fuera
+    document.addEventListener('click', (e) => {
+        if (!e.target.classList.contains('input-main')) {
+            document.querySelectorAll('.custom-list').forEach(l => l.style.display = 'none');
+        }
+    });
+
+    init();
+</script>
 </body>
 </html>
