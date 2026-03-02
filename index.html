@@ -30,40 +30,51 @@
 
         .container { width: 95%; max-width: 1000px; margin: 20px auto; }
         
+        /* Instrucciones */
+        .instructions {
+            background: #fffcf5;
+            border-left: 4px solid var(--accent);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        .instructions h4 { margin: 0 0 5px 0; color: var(--accent); text-transform: uppercase; font-size: 0.8rem; }
+
         /* Tabs */
         .tabs { display: flex; background: #ddd; border-radius: 8px 8px 0 0; overflow: hidden; }
         .tab { flex: 1; padding: 15px; border: none; cursor: pointer; font-family: 'Montserrat'; font-weight: 600; color: #666; transition: 0.3s; }
-        .tab.active { background: white; color: var(--dark); }
+        .tab.active { background: white; color: var(--dark); border-top: 3px solid var(--accent); }
 
         .content { background: white; padding: 25px; border-radius: 0 0 8px 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); min-height: 400px; }
         .panel { display: none; }
         .panel.active { display: block; animation: fadeIn 0.3s; }
 
-        /* Buscador Mejorado */
-        .search-box { position: relative; margin-bottom: 20px; }
+        /* Buscador */
+        .search-box { position: relative; width: 100%; }
         .input-main { 
             width: 100%; padding: 15px; border: 2px solid var(--border); border-radius: 8px; 
-            font-size: 1rem; box-sizing: border-box; outline: none;
+            font-size: 1rem; box-sizing: border-box; outline: none; background: #fff;
         }
         .input-main:focus { border-color: var(--accent); }
 
         .results-list { 
             position: absolute; width: 100%; background: white; border: 1px solid #ccc; 
-            max-height: 300px; overflow-y: auto; z-index: 1000; border-radius: 0 0 8px 8px;
+            max-height: 250px; overflow-y: auto; z-index: 1000; border-radius: 0 0 8px 8px;
             display: none; box-shadow: 0 10px 20px rgba(0,0,0,0.1);
         }
-        .results-list div { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #eee; }
+        .results-list div { padding: 12px 15px; cursor: pointer; border-bottom: 1px solid #eee; font-size: 0.9rem; }
         .results-list div:hover { background: #fffcf5; color: var(--accent); font-weight: 600; }
 
         /* Grid */
-        .grid-inputs { display: grid; grid-template-columns: 1fr 1fr auto; gap: 10px; margin-bottom: 20px; }
-        @media (max-width: 600px) { .grid-inputs { grid-template-columns: 1fr; } }
+        .grid-inputs { display: grid; grid-template-columns: 2fr 1fr auto; gap: 10px; margin-bottom: 20px; align-items: flex-start; }
+        @media (max-width: 700px) { .grid-inputs { grid-template-columns: 1fr; } }
 
-        select { padding: 12px; border: 2px solid var(--border); border-radius: 8px; background: white; }
+        select { padding: 14px; border: 2px solid var(--border); border-radius: 8px; background: white; width: 100%; font-family: 'Poppins'; }
 
         .btn-action { 
-            background: var(--dark); color: white; padding: 12px 25px; border: none; 
-            border-radius: 8px; cursor: pointer; font-weight: 600; text-transform: uppercase;
+            background: var(--dark); color: white; padding: 14px 25px; border: none; 
+            border-radius: 8px; cursor: pointer; font-weight: 600; text-transform: uppercase; height: 52px;
         }
         .btn-action:hover { background: var(--accent); }
         .btn-clear { background: #e0e0e0; color: #444; }
@@ -73,11 +84,10 @@
         table { width: 100%; border-collapse: collapse; background: white; }
         th { background: var(--gray); padding: 12px; font-size: 0.75rem; text-transform: uppercase; color: #888; border-bottom: 2px solid #eee; }
         td { padding: 12px; text-align: center; border-bottom: 1px solid #f9f9f9; }
-        .stock-num { font-weight: 700; color: var(--dark); }
+        .stock-num { font-weight: 700; color: var(--dark); background: #fdf8f3; }
         .no-stock { color: #ddd; }
 
-        /* Loader */
-        #status { text-align: center; padding: 20px; color: var(--accent); font-weight: 600; }
+        #status { text-align: center; padding: 40px; color: var(--accent); font-weight: 600; }
         
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     </style>
@@ -90,19 +100,31 @@
     </header>
 
     <div class="container">
-        <div id="status">Sincronizando base de datos completa...</div>
+        
+        <div class="instructions">
+            <h4>¿Cómo consultar?</h4>
+            1. Haz clic en <b>Buscar producto</b> para ver la lista o escribe el nombre.<br>
+            2. <b>Selecciona</b> el producto de la lista desplegable.<br>
+            3. Elige una <b>Talla</b> (opcional) y presiona el botón <b>VER</b>.
+        </div>
+
+        <div id="status">Cargando base de datos ilimitada...</div>
 
         <div id="app" style="display:none">
             <div class="tabs">
-                <button class="tab active" onclick="showPanel('inv', this)">📦 STOCK</button>
-                <button class="tab" onclick="showPanel('pri', this)">💰 PRECIOS</button>
+                <button id="tab-inv" class="tab active" onclick="showPanel('inv', this)">📦 CONSULTAR STOCK</button>
+                <button id="tab-pri" class="tab" onclick="showPanel('pri', this)">💰 CONSULTAR PRECIO</button>
             </div>
 
             <div class="content">
                 <div id="panel-inv" class="panel active">
                     <div class="grid-inputs">
                         <div class="search-box">
-                            <input type="text" id="refSearch" class="input-main" placeholder="Buscar producto (Ej: Zofya...)" oninput="filterRefs(this.value)" autocomplete="off">
+                            <input type="text" id="refSearch" class="input-main" 
+                                   placeholder="Click para ver productos..." 
+                                   onfocus="filterRefs('', 'resList')" 
+                                   oninput="filterRefs(this.value, 'resList')" 
+                                   autocomplete="off">
                             <div id="resList" class="results-list"></div>
                         </div>
                         <select id="sizeSelect"><option value="">Talla...</option></select>
@@ -115,9 +137,17 @@
                 </div>
 
                 <div id="panel-pri" class="panel">
-                    <div class="search-box">
-                        <input type="text" id="priSearch" class="input-main" placeholder="Buscar producto para ver precio..." oninput="filterRefs(this.value)" autocomplete="off">
-                        <div id="resListPri" class="results-list"></div>
+                    <div class="grid-inputs" style="grid-template-columns: 2fr auto auto;">
+                        <div class="search-box">
+                            <input type="text" id="priSearch" class="input-main" 
+                                   placeholder="Escribe el producto..." 
+                                   onfocus="filterRefs('', 'resListPri')" 
+                                   oninput="filterRefs(this.value, 'resListPri')" 
+                                   autocomplete="off">
+                            <div id="resListPri" class="results-list"></div>
+                        </div>
+                        <button class="btn-action" onclick="renderPrice()">Ver Precio</button>
+                        <button class="btn-action btn-clear" onclick="reset()">Limpiar</button>
                     </div>
                     <div id="outPrice" style="text-align:center; padding:30px;"></div>
                 </div>
@@ -160,16 +190,13 @@
                 resultados.forEach(res => {
                     res.data.forEach(fila => {
                         let ref = fila['Referencia'] ? fila['Referencia'].trim() : "";
-                        if (ref.length < 2) return; // Ignorar basura
+                        if (ref.length < 2 || ref.startsWith('#')) return;
 
                         refsUnicas.add(ref);
-
-                        // Guardar Precios
                         if (res.sede === 'Referencias' && fila['Precio Nuevo Paralelo y Multimarcas']) {
                             db_precios[ref] = fila['Precio Nuevo Paralelo y Multimarcas'];
                         }
 
-                        // Guardar Stock
                         let talla = fila['Talla'] ? fila['Talla'].trim() : "Única";
                         if (!db_inventario[ref]) db_inventario[ref] = {};
                         if (!db_inventario[ref][talla]) {
@@ -189,39 +216,41 @@
                 document.getElementById('app').style.display = 'block';
 
             } catch (e) {
-                document.getElementById('status').innerText = "Error cargando datos. Reintenta.";
+                document.getElementById('status').innerText = "Error de conexión. Recarga la página.";
             }
         }
 
-        function filterRefs(query) {
+        function filterRefs(query, targetListId) {
             const val = query.toUpperCase();
-            const listInv = document.getElementById('resList');
-            const listPri = document.getElementById('resListPri');
-            
-            [listInv, listPri].forEach(l => {
-                l.innerHTML = "";
-                l.style.display = val.length > 0 ? "block" : "none";
-            });
+            const list = document.getElementById(targetListId);
+            list.innerHTML = "";
+            list.style.display = "block";
 
-            if (val.length === 0) return;
-
-            const filtradas = lista_referencias.filter(r => r.toUpperCase().includes(val)).slice(0, 50);
+            // Si no hay texto, mostrar las primeras 100 por defecto
+            const filtradas = val === "" 
+                ? lista_referencias.slice(0, 100) 
+                : lista_referencias.filter(r => r.toUpperCase().includes(val)).slice(0, 100);
 
             filtradas.forEach(ref => {
                 const div = document.createElement('div');
                 div.innerText = ref;
-                div.onclick = () => selectRef(ref);
-                listInv.appendChild(div.cloneNode(true));
-                listPri.appendChild(div);
+                div.onmousedown = (e) => { // Usamos mousedown para que ocurra antes del blur
+                    e.preventDefault();
+                    selectRef(ref);
+                };
+                list.appendChild(div);
             });
         }
 
         function selectRef(ref) {
+            // Actualizar ambos inputs
             document.getElementById('refSearch').value = ref;
             document.getElementById('priSearch').value = ref;
+            
+            // Ocultar listas
             document.querySelectorAll('.results-list').forEach(l => l.style.display = 'none');
             
-            // Actualizar Tallas
+            // Cargar tallas
             const sel = document.getElementById('sizeSelect');
             sel.innerHTML = '<option value="ALL">Todas las tallas</option>';
             if (db_inventario[ref]) {
@@ -229,9 +258,6 @@
                     sel.innerHTML += `<option value="${t}">${t}</option>`;
                 });
             }
-
-            // Si estamos en la pestaña de precios, mostrar precio de una vez
-            if (document.getElementById('panel-pri').classList.contains('active')) renderPrice();
         }
 
         function renderStock() {
@@ -239,13 +265,13 @@
             const tallaSel = document.getElementById('sizeSelect').value;
             const out = document.getElementById('outStock');
 
-            if (!db_inventario[ref]) {
-                out.innerHTML = "<p style='color:red'>Producto no encontrado</p>";
+            if (!ref || !db_inventario[ref]) {
+                out.innerHTML = "<p style='color:red; text-align:center;'>⚠️ Selecciona un producto válido de la lista.</p>";
                 return;
             }
 
             let html = `<table><thead><tr><th>Talla</th>${TIENDAS.map(t => `<th>${t}</th>`).join('')}</tr></thead><tbody>`;
-            const tallasAMostrar = tallaSel === "ALL" || tallaSel === "" ? Object.keys(db_inventario[ref]).sort() : [tallaSel];
+            const tallasAMostrar = (tallaSel === "ALL" || tallaSel === "") ? Object.keys(db_inventario[ref]).sort() : [tallaSel];
 
             tallasAMostrar.forEach(t => {
                 html += `<tr><td style="font-weight:600">${t}</td>`;
@@ -264,13 +290,13 @@
             const p = db_precios[ref];
             
             if (p) {
-                out.innerHTML = `<div style="padding:20px; border:2px solid var(--accent); border-radius:12px;">
-                    <small style="color:#999">PRECIO PVP</small>
-                    <div style="font-size:2.5rem; font-weight:700; color:var(--dark)">${p}</div>
-                    <small>${ref}</small>
+                out.innerHTML = `<div style="padding:30px; border:2px solid var(--accent); border-radius:12px; background:#fffcf5;">
+                    <div style="color:var(--accent); font-size:0.8rem; font-weight:700; letter-spacing:1px; margin-bottom:10px;">PRECIO DE VENTA</div>
+                    <div style="font-size:3rem; font-weight:700; color:var(--dark)">${p}</div>
+                    <div style="color:#888; margin-top:10px;">REF: ${ref}</div>
                 </div>`;
             } else {
-                out.innerHTML = "<p>Precio no disponible para esta referencia.</p>";
+                out.innerHTML = `<p style="color:#999;">El producto existe, pero no tiene precio asignado en la base de datos.</p>`;
             }
         }
 
@@ -289,13 +315,14 @@
             document.getElementById('sizeSelect').innerHTML = '<option value="">Talla...</option>';
         }
 
-        cargarTodo();
-        // Cerrar listas si se hace click fuera
+        // Cerrar listas al hacer clic fuera
         document.addEventListener('click', (e) => {
             if (!e.target.classList.contains('input-main')) {
                 document.querySelectorAll('.results-list').forEach(l => l.style.display = 'none');
             }
         });
+
+        cargarTodo();
     </script>
 </body>
 </html>
